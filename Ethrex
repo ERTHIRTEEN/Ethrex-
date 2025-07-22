@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract Ethrex is ERC20 {
+    constructor(uint256 initialSupply) ERC20("Ethrex", "ETHRX") {
+        _mint(msg.sender, initialSupply * 10 ** decimals());
+    }
+}
+
+npm install --global hardhat
+
+npm install @openzeppelin/contracts
+
+mkdir ethrex-token && cd ethrex-token
+npx hardhat init
+
+require("@nomicfoundation/hardhat-toolbox");
+module.exports = {
+  solidity: "0.8.20",
+  networks: {
+    sepolia: {
+      url: "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+      accounts: ["YOUR_PRIVATE_KEY"]
+    }
+  }
+};
+
+npx hardhat compile
+
+const hre = require("hardhat");
+
+async function main() {
+  const initialSupply = 1000000; // 1 million Ethrex tokens
+  const Ethrex = await hre.ethers.getContractFactory("Ethrex");
+  const ethrex = await Ethrex.deploy(initialSupply);
+  await ethrex.deployed();
+  console.log("Ethrex deployed to:", ethrex.address);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+
+npx hardhat run scripts/deploy.js --network sepolia
+
+npx hardhat verify --network sepolia YOUR_CONTRACT_ADDRESS "1000000"
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Ethrex is ERC20, Ownable {
+    constructor(uint256 initialSupply) ERC20("Ethrex", "ETHRX") Ownable() {
+        _mint(msg.sender, initialSupply * 10 ** decimals());
+    }
+
+    function mint(address to, uint256 amount) public onlyOwner {
+        _mint(to, amount * 10 ** decimals());
+    }
+}
+
