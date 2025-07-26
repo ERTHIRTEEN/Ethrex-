@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract EtherXNFT is ERC721, ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+
+    // Constructor: Initialize the ERC721 token with name "EtherXNFT" and symbol "ETHX"
+    constructor() ERC721("EtherXNFT", "ETHX") Ownable(msg.sender) {}
+
+    // Mint a new NFT with a specific token URI (metadata)
+    function mintEtherX(address to, string memory tokenURI) public onlyOwner returns (uint256) {
+        uint256 newTokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+        return newTokenId;
+    }
+
+    // Override required by ERC721URIStorage
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    // Override required by ERC721URIStorage for burning tokens
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    // Burn an NFT (only token owner or approved)
+    function burn(uint256 tokenId) public {
+        require(_isApprovedOrOwner(msg.sender, tokenId), "Caller is not owner nor approved");
+        _burn(tokenId);
+    }
+
+    // Override supportsInterface for ERC721 and ERC721URIStorage
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+}
+
+{
+  "name": "EtherX #1",
+  "description": "A futuristic EtherX NFT with a pulsing energy core and cybernetic design.",
+  "image": "ipfs://<hash>/etherx.png",
+  "attributes": [
+    {"trait_type": "Tech Level", "value": "Quantum"},
+    {"trait_type": "Energy Core", "value": "Plasma"},
+    {"trait_type": "Rarity", "value": "Legendary"}
+  ]
+}
