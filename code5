@@ -1,0 +1,6 @@
+npx hardhat run scripts/deploy.js --network sepolia
+
+npx hardhat verify --network sepolia YOUR_CONTRACT_ADDRESS "1000000"
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
